@@ -62,21 +62,78 @@ public class BabsDAO {
 		return result;
 	}
 
-	public int getPickNumber(Station stazione, LocalDate ld) {
-		int result;
+	public void setCountArrivi(LocalDate data, Station station) {
+	
+	
 		Connection conn = DBConnect.getInstance().getConnection();
-		String sql = "Select count(*) as counter from trip where DATE(StartDate) = ? and StartTerminal = ?";
-		
+		String sql = "SELECT count(*) "+
+		             "FROM trip "+
+		              "WHERE EndTerminal=? AND DATE(EndDate)=?";
+		int result=0;
+
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
-			st.setDate(1, Date.valueOf(ld));
-			st.setInt(2,  stazione.getStationID());
+			st.setInt(1, station.getStationID());
+			st.setDate(2, Date.valueOf(data));
 			ResultSet rs = st.executeQuery();
-			
-//			rs.next();
-			rs.first();
-			result = rs.getInt("counter");
-			
+			if (rs.next()) {
+				result=rs.getInt("count(*)");
+			}
+			st.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error in database query", e);
+		}
+
+		station.setTripArrivo(result);
+		
+	}
+
+	public void setCountPartenze(LocalDate data, Station station) {
+		
+		Connection conn = DBConnect.getInstance().getConnection();
+		String sql = "SELECT count(*) "+
+		             "FROM trip "+
+		              "WHERE StartTerminal=? AND DATE(StartDate)=?";
+		int result=0;
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, station.getStationID());
+			st.setDate(2, Date.valueOf(data));
+			ResultSet rs = st.executeQuery();
+			if (rs.next()) {
+				result=rs.getInt("count(*)");
+			}
+			st.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error in database query", e);
+		}
+
+		station.setTripPartenza(result);
+	}
+
+	public List<Trip> getAllTripsDataPartenza(LocalDate data) {
+		List<Trip> result = new LinkedList<Trip>();
+		Connection conn = DBConnect.getInstance().getConnection();
+		String sql = "SELECT * FROM trip WHERE StartDate=? ";
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setDate(1, Date.valueOf(data));
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				Trip trip = new Trip(rs.getInt("tripid"), rs.getInt("duration"), rs.getTimestamp("startdate").toLocalDateTime(), rs.getInt("startterminal"),
+						rs.getTimestamp("enddate").toLocalDateTime(), rs.getInt("endterminal"));
+				result.add(trip);
+			}
+			st.close();
+			conn.close();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error in database query", e);
@@ -84,21 +141,25 @@ public class BabsDAO {
 
 		return result;
 	}
-	
-	public int getDropNumber(Station stazione, LocalDate ld) {
-		int result;
+
+	public List<Trip> getAllTripsDataArrivo(LocalDate data) {
+		List<Trip> result = new LinkedList<Trip>();
 		Connection conn = DBConnect.getInstance().getConnection();
-		String sql = "Select count(*) as counter from trip where DATE(EndDate) = ? and EndTerminal = ?";
+		String sql = "SELECT * FROM trip WHERE EndDate=? ";
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
-			st.setDate(1, Date.valueOf(ld));
-			st.setInt(2,  stazione.getStationID());
+			st.setDate(1, Date.valueOf(data));
 			ResultSet rs = st.executeQuery();
-			
-			rs.first();
-			result = rs.getInt("counter");
-			
+
+			while (rs.next()) {
+				Trip trip = new Trip(rs.getInt("tripid"), rs.getInt("duration"), rs.getTimestamp("startdate").toLocalDateTime(), rs.getInt("startterminal"),
+						rs.getTimestamp("enddate").toLocalDateTime(), rs.getInt("endterminal"));
+				result.add(trip);
+			}
+			st.close();
+			conn.close();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error in database query", e);
@@ -107,3 +168,5 @@ public class BabsDAO {
 		return result;
 	}
 }
+
+

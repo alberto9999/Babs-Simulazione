@@ -7,6 +7,10 @@ public class Station {
 	private double lat;
 	private double lon;
 	private int dockCount;
+	private int tripPartenza;
+	private int tripArrivo;
+	private int capienza;
+	
 
 	public Station(int stationID, String name, double lat, double lon, int dockCount) {
 		super();
@@ -15,6 +19,9 @@ public class Station {
 		this.lat = lat;
 		this.lon = lon;
 		this.dockCount = dockCount;
+		this.tripPartenza=0;
+		this.tripArrivo=0;
+		this.capienza=0;
 	}
 
 	public int getStationID() {
@@ -56,4 +63,58 @@ public class Station {
 	public void setDockCount(int dockCount) {
 		this.dockCount = dockCount;
 	}
+
+	public int getTripPartenza() {
+		return tripPartenza;
+	}
+
+	public void setTripPartenza(int tripPartenza) {
+		this.tripPartenza = tripPartenza;
+	}
+
+	public int getTripArrivo() {
+		return tripArrivo;
+	}
+
+	public void setTripArrivo(int tripArrivo) {
+		this.tripArrivo = tripArrivo;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + stationID;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Station other = (Station) obj;
+		if (stationID != other.stationID)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
+	public int getCapienza() {
+		return capienza;
+	}
+
+	public void setCapienza(int capienza) {
+		this.capienza = capienza;
+	}
+	
+	
+	
 }
